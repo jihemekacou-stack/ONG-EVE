@@ -1,0 +1,6 @@
+{
+  "name": "ONG EVE - Portail Institutionnel",
+  "description": "Site institutionnel de l'ONG EVE engagée pour l'environnement, les femmes, et l'éducation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
