@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import customLogo from "@/src/assets/images/logo.png";
-import { Leaf, Mail, MapPin, Phone, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Leaf, Mail, MapPin, Phone, Facebook } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 
 export function Footer() {
@@ -27,17 +27,8 @@ export function Footer() {
               enfants et la préservation de l'environnement depuis 15 ans.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="https://www.facebook.com/ONGEVE2010" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
               </a>
             </div>
           </div>
