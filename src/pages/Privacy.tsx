@@ -59,7 +59,7 @@ export default function Privacy() {
                 Conformément aux réglementations en vigueur (notamment le RGPD si applicable), vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Vous pouvez également vous opposer à leur traitement.
               </p>
               <p className="mt-2">
-                Pour faire valoir ces droits, veuillez nous contacter à l'adresse suivante : <strong>privacy@ongeve.org</strong>.
+                Pour faire valoir ces droits, veuillez nous contacter à l'adresse suivante : <strong>jihemekacou@gmail.com</strong>.
               </p>
             </section>
 

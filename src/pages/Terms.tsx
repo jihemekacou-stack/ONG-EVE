@@ -22,9 +22,9 @@ export default function Terms() {
               <div className="bg-slate-50 p-4 border border-slate-100 rounded-xl mt-3 text-slate-700">
                 <strong>ONG EVE</strong><br />
                 Organisation Non Gouvernementale à but non lucratif<br />
-                Siège Social : 123 Avenue des Casernes, 01 BP 456 Abidjan 01, Côte d'Ivoire<br />
-                Téléphone : +225 01 23 45 67 89<br />
-                Email : contact@ongeve.org
+                Siège Social : soleil 3 / 8tranche, derrière la station Shell KFC, Abidjan, Côte d'Ivoire<br />
+                Téléphone : (+225) 27 22 49 80 78 / (+225) 07 59 49 52 34<br />
+                Email : jihemekacou@gmail.com
               </div>
             </section>
 

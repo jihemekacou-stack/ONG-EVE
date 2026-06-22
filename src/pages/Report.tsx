@@ -15,6 +15,60 @@ const CATEGORIES = [
 export default function Report() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isAnonymous, setIsAnonymous] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{ type: "success" | "error" | null; message: string }>({ type: null, message: "" });
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    
+    if (!selectedCategory) {
+      setSubmitResult({ type: "error", message: "Veuillez sélectionner la nature du problème." });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitResult({ type: null, message: "" });
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    
+    // Check file sizes (limit to 1MB total to avoid "Request too long" from Web3Forms)
+    const files = formData.getAll("attachment") as File[];
+    const totalSize = files.reduce((acc, file) => acc + (file.size || 0), 0);
+    if (totalSize > 1 * 1024 * 1024) {
+      setSubmitResult({ type: "error", message: "Le fichier est trop volumineux. La taille maximale est de 1 MB. Veuillez compresser votre image." });
+      setIsSubmitting(false);
+      return;
+    }
+
+    formData.append("access_key", "1d213cd9-2fe1-43b2-8cd5-c1ae6c30fad6");
+    formData.append("subject", "Nouveau Signalement - ONG EVE");
+    formData.append("category", CATEGORIES.find(c => c.id === selectedCategory)?.label || selectedCategory);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitResult({ type: "success", message: "Signalement envoyé avec succès. Nous interviendrons dès que possible." });
+        form.reset();
+        setSelectedCategory(null);
+        setIsAnonymous(true);
+      } else {
+        console.error("Error", data);
+        setSubmitResult({ type: "error", message: data.message || "Une erreur s'est produite lors de l'envoi." });
+      }
+    } catch (error) {
+      console.error(error);
+      setSubmitResult({ type: "error", message: "Impossible de se connecter au serveur. Veuillez réessayer plus tard." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="w-full bg-slate-50 min-h-screen py-20">
@@ -37,7 +91,7 @@ export default function Report() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 p-8 md:p-12"
         >
-          <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+          <form className="space-y-8" onSubmit={onSubmit}>
             
             {/* Categories */}
             <div>
@@ -68,6 +122,8 @@ export default function Report() {
             <div>
               <h3 className="text-lg font-semibold text-slate-800 mb-4">2. Description des faits *</h3>
               <textarea 
+                name="description"
+                required
                 rows={5} 
                 className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors resize-none" 
                 placeholder="Décrivez la situation avec un maximum de détails..."
@@ -80,6 +136,8 @@ export default function Report() {
                 <h3 className="text-lg font-semibold text-slate-800 mb-4">3. Localisation *</h3>
                 <div className="flex gap-2">
                   <input 
+                    name="location"
+                    required
                     type="text" 
                     className="flex-1 p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-colors" 
                     placeholder="Ville, Quartier, Repère..."
@@ -94,8 +152,8 @@ export default function Report() {
                 <h3 className="text-lg font-semibold text-slate-800 mb-4">4. Preuves (Optionnel)</h3>
                 <label className="flex items-center justify-center gap-2 p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors h-[58px]">
                   <UploadCloud className="w-5 h-5 text-slate-400" />
-                  <span className="text-sm font-medium text-slate-600">Ajouter photos/vidéos</span>
-                  <input type="file" className="hidden" multiple accept="image/*,video/*" />
+                  <span className="text-sm font-medium text-slate-600">Ajouter 1 fichier max (Max 1 MB)</span>
+                  <input type="file" name="attachment" className="hidden" accept="image/*,video/*" />
                 </label>
               </div>
             </div>
@@ -109,6 +167,7 @@ export default function Report() {
                   <input 
                     type="radio" 
                     name="anonymity" 
+                    value="anonymous"
                     checked={isAnonymous} 
                     onChange={() => setIsAnonymous(true)}
                     className="w-5 h-5 text-red-600 focus:ring-red-500" 
@@ -119,6 +178,7 @@ export default function Report() {
                   <input 
                     type="radio" 
                     name="anonymity" 
+                    value="public"
                     checked={!isAnonymous} 
                     onChange={() => setIsAnonymous(false)}
                     className="w-5 h-5 text-red-600 focus:ring-red-500" 
@@ -133,13 +193,19 @@ export default function Report() {
                   animate={{ opacity: 1, height: 'auto' }}
                   className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
                 >
-                  <input type="text" placeholder="Nom et prénom" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500" />
-                  <input type="tel" placeholder="Téléphone ou WhatsApp" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500" />
+                  <input type="text" name="name" required={!isAnonymous} placeholder="Nom et prénom" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500" />
+                  <input type="tel" name="phone" placeholder="Téléphone ou WhatsApp" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500" />
                 </motion.div>
               )}
 
-              <Button type="submit" variant="destructive" className="w-full h-14 text-lg font-bold">
-                Soumettre le signalement
+              {submitResult.type && (
+                <div className={`p-4 rounded-xl text-sm mb-6 ${submitResult.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                  {submitResult.message}
+                </div>
+              )}
+
+              <Button type="submit" variant="destructive" className="w-full h-14 text-lg font-bold" disabled={isSubmitting}>
+                {isSubmitting ? "Envoi en cours..." : "Soumettre le signalement"}
               </Button>
             </div>
             

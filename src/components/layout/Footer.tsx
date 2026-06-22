@@ -49,15 +49,15 @@ export function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-white shrink-0" />
-                <span className="text-sm text-white">123 Avenue des Casernes<br />Abidjan, Côte d'Ivoire</span>
+                <span className="text-sm text-white">soleil 3 / 8tranche<br />derrière la station Shell KFC<br />Abidjan, Côte d'Ivoire</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-white shrink-0" />
-                <span className="text-sm text-white">+225 01 23 45 67 89</span>
+                <span className="text-sm text-white">(+225) 07 59 49 52 34</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-white shrink-0" />
-                <span className="text-sm text-white">contact@ongeve.org</span>
+                <span className="text-sm text-white">jihemekacou@gmail.com</span>
               </li>
             </ul>
           </div>

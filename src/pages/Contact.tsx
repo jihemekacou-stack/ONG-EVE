@@ -1,8 +1,45 @@
 import { motion } from "motion/react";
 import { Mail, MapPin, Phone, Send } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
+import { useState } from "react";
 
 export default function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{ type: "success" | "error" | null; message: string }>({ type: null, message: "" });
+
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setSubmitResult({ type: null, message: "" });
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    formData.append("access_key", "1d213cd9-2fe1-43b2-8cd5-c1ae6c30fad6");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSubmitResult({ type: "success", message: "Message envoyé avec succès ! Nous vous recontacterons bientôt." });
+        form.reset();
+      } else {
+        console.error("Error", data);
+        setSubmitResult({ type: "error", message: data.message || "Une erreur s'est produite lors de l'envoi du message." });
+      }
+    } catch (error) {
+      console.error(error);
+      setSubmitResult({ type: "error", message: "Impossible de se connecter au serveur. Veuillez réessayer plus tard." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="w-full">
       <section className="bg-slate-50 py-20 border-b border-slate-100">
@@ -50,7 +87,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-slate-800 text-lg mb-1">Siège Social</h4>
-                    <p className="text-slate-600">123 Avenue des Casernes<br />01 BP 456 Abidjan 01<br />Côte d'Ivoire</p>
+                    <p className="text-slate-600">soleil 3 / 8tranche<br />derrière la station Shell KFC<br />Abidjan, Côte d'Ivoire</p>
                   </div>
                 </div>
 
@@ -60,7 +97,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-slate-800 text-lg mb-1">Téléphone & WhatsApp</h4>
-                    <p className="text-slate-600">+225 01 23 45 67 89<br />+225 05 98 76 54 32</p>
+                    <p className="text-slate-600">Fixe: (+225) 27 22 49 80 78<br />Mobile: (+225) 07 59 49 52 34</p>
                   </div>
                 </div>
 
@@ -70,7 +107,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-slate-800 text-lg mb-1">Email</h4>
-                    <p className="text-slate-600">contact@ongeve.org<br />partenariats@ongeve.org</p>
+                    <p className="text-slate-600">jihemekacou@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -85,21 +122,21 @@ export default function Contact() {
             >
               <h3 className="text-2xl font-display font-bold text-secondary mb-8">Envoyez-nous un message</h3>
               
-              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-6" onSubmit={onSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Nom complet *</label>
-                    <input type="text" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" placeholder="Jean Dupont" />
+                    <input type="text" name="name" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" placeholder="Jean Dupont" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Adresse email *</label>
-                    <input type="email" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" placeholder="jean@exemple.com" />
+                    <input type="email" name="email" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors" placeholder="jean@exemple.com" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Sujet *</label>
-                  <select className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-slate-700">
+                  <select name="subject" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors text-slate-700">
                     <option>Demande d'information générale</option>
                     <option>Proposition de partenariat</option>
                     <option>Question sur les dons</option>
@@ -110,11 +147,17 @@ export default function Contact() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Message *</label>
-                  <textarea rows={5} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Comment pouvons-nous vous aider ?"></textarea>
+                  <textarea name="message" required rows={5} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none" placeholder="Comment pouvons-nous vous aider ?"></textarea>
                 </div>
 
-                <Button variant="default" className="w-full h-14 text-lg">
-                  <Send className="w-5 h-5 mr-2" /> Envoyer le message
+                {submitResult.type && (
+                  <div className={`p-4 rounded-xl text-sm ${submitResult.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                    {submitResult.message}
+                  </div>
+                )}
+
+                <Button variant="default" className="w-full h-14 text-lg" disabled={isSubmitting}>
+                  <Send className="w-5 h-5 mr-2" /> {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
                 </Button>
                 <p className="text-xs text-slate-500 text-center mt-4">
                   En soumettant ce formulaire, vous acceptez notre politique de confidentialité quant à l'utilisation de vos données pour vous répondre.
